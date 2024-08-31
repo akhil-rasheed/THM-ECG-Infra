@@ -4,7 +4,7 @@ provider "aws" {
 
 resource "aws_instance" "backend_server" {
   ami           = "ami-830c94e3"
-  instance_type = "t2.micro"
+  instance_type = "t2.medium"
 
   tags = {
     Name = "BackendAndDatabase"
@@ -14,7 +14,7 @@ resource "aws_instance" "backend_server" {
 
 resource "aws_instance" "frontend_server" {
   ami           = "ami-830c94e3"
-  instance_type = "t2.micro"
+  instance_type = "t2.medium"
 
   tags = {
     Name = "Frontend"
