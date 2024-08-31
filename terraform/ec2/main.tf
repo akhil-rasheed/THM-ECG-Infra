@@ -108,18 +108,24 @@ data "aws_ami" "ubuntu22" {
 resource "aws_instance" "thm_backend_server" {
   ami           = data.aws_ami.ubuntu22.id
   instance_type = "t2.medium"
+  subnet_id     = aws_subnet.thm_private_subnet.id
+  security_groups = [aws_security_group.thm_security_group.name]
 
   tags = {
-    Name = "BackendAndDatabase"
+    Name = "THM-Backend-Server"
+    Project = "THM-ECG"
   }
 }
 
-
-resource "aws_instance" "frontend_server" {
-  ami           = "ami-830c94e3"
+resource "aws_instance" "thm_frontend_server" {
+  ami           = data.aws_ami.ubuntu22.id
   instance_type = "t2.medium"
+  subnet_id     = aws_subnet.thm_public_subnet.id
+  security_groups = [aws_security_group.thm_security_group.name]
+  associate_public_ip_address = true
 
   tags = {
-    Name = "Frontend"
+    Name = "THM-Frontend-Server"
+    Project = "THM-ECG"
   }
 }
