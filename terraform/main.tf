@@ -2,32 +2,20 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.16"
+      version = "~> 5.65.0"
     }
   }
 
-  required_version = ">= 1.2.0"
-}
-
-provider "aws" {
-  region = "us-west-2"
-}
-
-resource "aws_instance" "backend_server" {
-  ami           = "ami-830c94e3"
-  instance_type = "t2.micro"
-
-  tags = {
-    Name = "BackendAndDatabase"
-  }
+  required_version = ">= 1.9.0"
 }
 
 
-resource "aws_instance" "frontend_server" {
-  ami           = "ami-830c94e3"
-  instance_type = "t2.micro"
+module "ec2" {
+  source = "./ec2"
+  tags   = var.tags
+}
 
-  tags = {
-    Name = "Frontend"
-  }
+module "ecr" {
+  source = "./ecr"
+  tags   = var.tags
 }
