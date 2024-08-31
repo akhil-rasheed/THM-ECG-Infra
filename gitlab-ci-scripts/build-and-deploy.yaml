@@ -1,0 +1,46 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  DOCKER_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  SSH_USER: ""
+  SSH_KEY: ""
+
+build_image:
+  stage: build
+  script:
+    - docker build -t $DOCKER_IMAGE .
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker push $DOCKER_IMAGE
+  only:
+    - master
+
+deploy_frontend:
+  stage: deploy
+  script:
+    - ssh -i $SSH_KEY $SSH_USER@$FRONTEND_EC2_IP <<EOF
+      docker pull $DOCKER_IMAGE
+      docker stop frontend_container || true
+      docker rm frontend_container || true
+      docker run -d --name frontend_container -p 80:80 $DOCKER_IMAGE
+      EOF
+  only:
+    - master
+  variables:
+    FRONTEND_EC2_IP: $CI_JOB_FRONTEND_IP
+
+deploy_backend:
+  stage: deploy
+  script:
+    - scp -i $SSH_KEY docker-compose.yml $SSH_USER@$BACKEND_EC2_IP:/home/$SSH_USER/
+    - ssh -i $SSH_KEY $SSH_USER@$BACKEND_EC2_IP <<EOF
+      cd /home/$SSH_USER/
+      docker-compose down
+      docker-compose pull
+      docker-compose up -d
+      EOF
+  only:
+    - master
+  variables:
+    BACKEND_EC2_IP: $CI_JOB_BACKEND_IP
