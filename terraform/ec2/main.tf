@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-west-2"
+  region = "eu-central-1"
 }
 
 resource "aws_instance" "backend_server" {
