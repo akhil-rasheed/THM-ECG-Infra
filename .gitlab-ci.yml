@@ -3,10 +3,9 @@ stages:
   - deploy
 
 variables:
-  AWS_REGION: "eu-central-1" 
-  ECR_REPOSITORY_URI: $CI_REGISTRY_IMAGE
-  SSH_USER: ""
-  SSH_KEY: ""
+  AWS_REGION: "eu-central-1"
+  SSH_USER: "$SSH_USER"
+  SSH_KEY: "$SSH_KEY"
 
 build_image:
   stage: build
@@ -28,6 +27,4 @@ deploy_backend:
       docker-compose up -d
       EOF
   only:
-    - master
-  variables:
-    BACKEND_EC2_IP: $CI_JOB_BACKEND_IP
+    - main
