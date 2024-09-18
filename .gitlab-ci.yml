@@ -4,27 +4,39 @@ stages:
 
 variables:
   AWS_REGION: "eu-central-1"
-  SSH_USER: "$SSH_USER"
-  SSH_KEY: "$SSH_KEY"
-
+  ECR_REPOSITORY_URI: $CI_REGISTRY_IMAGE
+  
 build_image:
   stage: build
+  image: docker:latest
+  services:
+  - docker:dind
   script:
+    - apk add --no-cache curl jq python3 py3-pip
+    - pip install awscli --break-system-packages
+    - cd backend
     - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPOSITORY_URI
     - docker build -t $ECR_REPOSITORY_URI:$CI_COMMIT_SHA .
     - docker push $ECR_REPOSITORY_URI:$CI_COMMIT_SHA
   only:
-    - master
+    - main
 
 deploy_backend:
   stage: deploy
   script:
-    - scp -i $SSH_KEY docker-compose.yml $SSH_USER@$BACKEND_EC2_IP:/home/$SSH_USER/
-    - ssh -i $SSH_KEY $SSH_USER@$BACKEND_EC2_IP <<EOF
-      cd /home/$SSH_USER/
-      docker-compose down
-      docker-compose pull
-      docker-compose up -d
+    - echo "$SSH_KEY" > /tmp/id_rsa
+    - chmod 600 /tmp/id_rsa
+    
+    - scp -i /tmp/id_rsa docker-compose.yml $SSH_USER@$BACKEND_EC2_IP:/home/$SSH_USER/
+    - ssh -i /tmp/id_rsa $SSH_USER@$BACKEND_EC2_IP <<EOF
+        cd /home/$SSH_USER/
+        docker-compose down
+        docker-compose pull
+        docker-compose up -d
       EOF
+  when: manual
   only:
     - main
+  variables:
+    BACKEND_EC2_IP: $CI_JOB_BACKEND_IP
+
