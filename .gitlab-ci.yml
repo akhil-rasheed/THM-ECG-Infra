@@ -17,6 +17,7 @@ build_image:
     - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPOSITORY_URI
     - docker build -t $ECR_REPOSITORY_URI:$CI_COMMIT_SHA .
     - docker push $ECR_REPOSITORY_URI:$CI_COMMIT_SHA
+    - docker push $ECR_REPOSITORY_URI:latest
   only:
     - main
 
@@ -29,14 +30,14 @@ deploy_backend:
     - mkdir -p ~/.ssh
     - ssh-keyscan -H $BACKEND_EC2_IP >> ~/.ssh/known_hosts
     
-    - scp -i /tmp/id_rsa docker-compose-dev.yml $SSH_USER@$BACKEND_EC2_IP:/home/$SSH_USER/
+    - scp -i /tmp/id_rsa docker-compose.yml $SSH_USER@$BACKEND_EC2_IP:/home/$SSH_USER/
     - ssh -i /tmp/id_rsa $SSH_USER@$BACKEND_EC2_IP <<EOF
-        cd /home/$SSH_USER/
-        docker-compose down
-        docker-compose pull
-        docker-compose up -d
-      EOF
-  when: manual
+    - cd /home/$SSH_USER/
+    - sudo apt-get install docker-compose-plugin
+    - docker compose down
+    - docker compose pull
+    - docker compose up -d
+    - EOF
   only:
     - main
   variables:
