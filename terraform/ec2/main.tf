@@ -110,6 +110,7 @@ resource "aws_instance" "thm_backend_server" {
   instance_type = "t2.medium"
   subnet_id     = aws_subnet.thm_private_subnet.id
   security_groups = [aws_security_group.thm_security_group.id]
+  associate_public_ip_address = true
 
   tags = {
     Name = "THM-Backend-Server"
@@ -117,15 +118,15 @@ resource "aws_instance" "thm_backend_server" {
   }
 }
 
-resource "aws_instance" "thm_frontend_server" {
-  ami           = data.aws_ami.ubuntu22.id
-  instance_type = "t2.medium"
-  subnet_id     = aws_subnet.thm_public_subnet.id
-  security_groups = [aws_security_group.thm_security_group.id]
-  associate_public_ip_address = true
+# resource "aws_instance" "thm_frontend_server" {
+#   ami           = data.aws_ami.ubuntu22.id
+#   instance_type = "t2.medium"
+#   subnet_id     = aws_subnet.thm_public_subnet.id
+#   security_groups = [aws_security_group.thm_security_group.id]
+#   associate_public_ip_address = true
 
-  tags = {
-    Name = "THM-Frontend-Server"
-    Project = "THM-ECG"
-  }
-}
+#   tags = {
+#     Name = "THM-Frontend-Server"
+#     Project = "THM-ECG"
+#   }
+# }
