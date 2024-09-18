@@ -14,7 +14,6 @@ build_image:
   script:
     - apk add --no-cache curl jq python3 py3-pip
     - pip install awscli --break-system-packages
-    - cd backend
     - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPOSITORY_URI
     - docker build -t $ECR_REPOSITORY_URI:$CI_COMMIT_SHA .
     - docker push $ECR_REPOSITORY_URI:$CI_COMMIT_SHA
@@ -26,8 +25,11 @@ deploy_backend:
   script:
     - echo "$SSH_KEY" > /tmp/id_rsa
     - chmod 600 /tmp/id_rsa
+
+    - mkdir -p ~/.ssh
+    - ssh-keyscan -H $BACKEND_EC2_IP >> ~/.ssh/known_hosts
     
-    - scp -i /tmp/id_rsa docker-compose.yml $SSH_USER@$BACKEND_EC2_IP:/home/$SSH_USER/
+    - scp -i /tmp/id_rsa docker-compose-dev.yml $SSH_USER@$BACKEND_EC2_IP:/home/$SSH_USER/
     - ssh -i /tmp/id_rsa $SSH_USER@$BACKEND_EC2_IP <<EOF
         cd /home/$SSH_USER/
         docker-compose down
@@ -39,4 +41,3 @@ deploy_backend:
     - main
   variables:
     BACKEND_EC2_IP: $CI_JOB_BACKEND_IP
-
