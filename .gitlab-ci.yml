@@ -16,20 +16,6 @@ build_image:
   only:
     - master
 
-deploy_frontend:
-  stage: deploy
-  script:
-    - ssh -i $SSH_KEY $SSH_USER@$FRONTEND_EC2_IP <<EOF
-      docker pull $DOCKER_IMAGE
-      docker stop frontend_container || true
-      docker rm frontend_container || true
-      docker run -d --name frontend_container -p 80:80 $DOCKER_IMAGE
-      EOF
-  only:
-    - master
-  variables:
-    FRONTEND_EC2_IP: $CI_JOB_FRONTEND_IP
-
 deploy_backend:
   stage: deploy
   script:
