@@ -48,3 +48,8 @@ coverage.xml
 *.sw*
 manage.py
 .DS_Store
+
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
