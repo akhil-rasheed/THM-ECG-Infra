@@ -112,6 +112,13 @@ resource "aws_instance" "thm_backend_server" {
   security_groups = [aws_security_group.thm_security_group.id]
   associate_public_ip_address = true
   key_name = "thm-ecg-backend"
+
+  root_block_device {
+    volume_size           = 100  
+    volume_type           = "gp3"  
+    delete_on_termination = true  
+  }
+
   tags = {
     Name = "THM-Backend-Server"
     Project = "THM-ECG"
