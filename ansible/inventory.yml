@@ -1,0 +1,6 @@
+all:
+  hosts:
+    thm_backend:
+      ansible_host: "{{ lookup('env', 'BACKEND_EC2_IP') }}"
+      ansible_user: "{{ lookup('env', 'SSH_USER') }}"
+      ansible_ssh_private_key_file: "{{ lookup('env', 'SSH_KEY') }}"
