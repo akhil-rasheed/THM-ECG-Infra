@@ -10,13 +10,14 @@ build_image:
   stage: build
   image: docker:latest
   services:
-  - docker:dind
+    - docker:dind
   script:
     - apk add --no-cache curl jq python3 py3-pip
     - pip install awscli --break-system-packages
     - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPOSITORY_URI
     - docker build -t $ECR_REPOSITORY_URI:$CI_COMMIT_SHA .
     - docker push $ECR_REPOSITORY_URI:$CI_COMMIT_SHA
+    - docker tag $ECR_REPOSITORY_URI:$CI_COMMIT_SHA $ECR_REPOSITORY_URI:latest
     - docker push $ECR_REPOSITORY_URI:latest
   only:
     - main
@@ -32,12 +33,12 @@ deploy_backend:
     
     - scp -i /tmp/id_rsa docker-compose.yml $SSH_USER@$BACKEND_EC2_IP:/home/$SSH_USER/
     - ssh -i /tmp/id_rsa $SSH_USER@$BACKEND_EC2_IP <<EOF
-    - cd /home/$SSH_USER/
-    - sudo apt-get install docker-compose-plugin
-    - docker compose down
-    - docker compose pull
-    - docker compose up -d
-    - EOF
+      cd /home/$SSH_USER/
+      sudo apt-get update && sudo apt-get install -y docker-compose-plugin
+      docker compose down
+      docker compose pull
+      docker compose up -d
+    EOF
   only:
     - main
   variables:
