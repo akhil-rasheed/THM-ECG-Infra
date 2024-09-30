@@ -1,0 +1,6 @@
+services:
+  frontend:
+    build: ${ECR_REPOSITORY_URI}:latest
+    ports:
+      - "80:80"
+    restart: always
