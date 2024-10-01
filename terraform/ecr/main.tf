@@ -12,12 +12,12 @@ resource "aws_ecr_repository" "application-backend" {
   }
 }
 
-# resource "aws_ecr_repository" "application-frontend" {
-#   name                 = "application-frontend"
-#   image_tag_mutability = "MUTABLE"
-#   tags                 = var.tags
+resource "aws_ecr_repository" "application-frontend" {
+  name                 = "application-frontend"
+  image_tag_mutability = "MUTABLE"
+  tags                 = var.tags
 
-#   image_scanning_configuration {
-#     scan_on_push = true
-#   }
-# }
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
