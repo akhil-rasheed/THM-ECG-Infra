@@ -7,7 +7,7 @@ resource "aws_vpc" "thm_vpc" {
   enable_dns_support   = true
   enable_dns_hostnames = true
   tags = {
-    Name = "THM-VPC"
+    Name    = "THM-VPC"
     Project = "THM-ECG"
   }
 }
@@ -18,7 +18,7 @@ resource "aws_subnet" "thm_public_subnet" {
   map_public_ip_on_launch = true
   availability_zone       = "eu-central-1a"
   tags = {
-    Name = "THM-Public-Subnet"
+    Name    = "THM-Public-Subnet"
     Project = "THM-ECG"
   }
 }
@@ -28,7 +28,7 @@ resource "aws_subnet" "thm_private_subnet" {
   cidr_block        = "10.0.2.0/24"
   availability_zone = "eu-central-1a"
   tags = {
-    Name = "THM-Private-Subnet"
+    Name    = "THM-Private-Subnet"
     Project = "THM-ECG"
   }
 }
@@ -36,7 +36,7 @@ resource "aws_subnet" "thm_private_subnet" {
 resource "aws_internet_gateway" "thm_igw" {
   vpc_id = aws_vpc.thm_vpc.id
   tags = {
-    Name = "THM-Internet-Gateway"
+    Name    = "THM-Internet-Gateway"
     Project = "THM-ECG"
   }
 }
@@ -48,7 +48,7 @@ resource "aws_route_table" "thm_public_route_table" {
     gateway_id = aws_internet_gateway.thm_igw.id
   }
   tags = {
-    Name = "THM-Public-Route-Table"
+    Name    = "THM-Public-Route-Table"
     Project = "THM-ECG"
   }
 }
@@ -91,7 +91,7 @@ resource "aws_security_group" "thm_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = {
-    Name = "THM-Security-Group"
+    Name    = "THM-Security-Group"
     Project = "THM-ECG"
   }
 }
@@ -112,34 +112,41 @@ data "aws_ami" "ubuntu22" {
 }
 
 resource "aws_instance" "thm_backend_server" {
-  ami           = data.aws_ami.ubuntu22.id
-  instance_type = "t2.medium"
-  subnet_id     = aws_subnet.thm_public_subnet.id
-  security_groups = [aws_security_group.thm_security_group.id]
+  ami                         = data.aws_ami.ubuntu22.id
+  instance_type               = "t2.medium"
+  subnet_id                   = aws_subnet.thm_public_subnet.id
+  vpc_security_group_ids      = [aws_security_group.thm_security_group.id]
   associate_public_ip_address = true
-  key_name = "thm-ecg-backend"
+  key_name                    = "thm-ecg-backend"
 
   root_block_device {
-    volume_size           = 100  
-    volume_type           = "gp3"  
-    delete_on_termination = true  
+    volume_size           = 100
+    volume_type           = "gp3"
+    delete_on_termination = true
   }
 
   tags = {
-    Name = "THM-Backend-Server"
+    Name    = "THM-Backend-Server"
     Project = "THM-ECG"
   }
 }
 
-# Uncomment and adjust the following if you need a frontend server in the public subnet
-# resource "aws_instance" "thm_frontend_server" {
-#   ami           = data.aws_ami.ubuntu22.id
-#   instance_type = "t2.medium"
-#   subnet_id     = aws_subnet.thm_public_subnet.id
-#   security_groups = [aws_security_group.thm_security_group.id]
-#   associate_public_ip_address = true
-#   tags = {
-#     Name = "THM-Frontend-Server"
-#     Project = "THM-ECG"
-#   }
-# }
+resource "aws_instance" "thm_frontend_server" {
+  ami                         = data.aws_ami.ubuntu22.id
+  instance_type               = "t2.medium"
+  subnet_id                   = aws_subnet.thm_public_subnet.id
+  vpc_security_group_ids      = [aws_security_group.thm_security_group.id]
+  associate_public_ip_address = true
+  key_name                    = "thm-ecg-backend"
+
+  root_block_device {
+    volume_size           = 20
+    volume_type           = "gp3"
+    delete_on_termination = true
+  }
+
+  tags = {
+    Name    = "THM-Frontend-Server"
+    Project = "THM-ECG"
+  }
+}
