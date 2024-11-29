@@ -111,7 +111,7 @@ data "aws_ami" "ubuntu22" {
   }
 }
 
-resource "aws_instance" "thm_backend_server" {
+resource "aws_instance" "thm_application_instance" {
   ami                         = data.aws_ami.ubuntu22.id
   instance_type               = "t2.medium"
   subnet_id                   = aws_subnet.thm_public_subnet.id
@@ -126,27 +126,7 @@ resource "aws_instance" "thm_backend_server" {
   }
 
   tags = {
-    Name    = "THM-Backend-Server"
-    Project = "THM-ECG"
-  }
-}
-
-resource "aws_instance" "thm_frontend_server" {
-  ami                         = data.aws_ami.ubuntu22.id
-  instance_type               = "t2.medium"
-  subnet_id                   = aws_subnet.thm_public_subnet.id
-  vpc_security_group_ids      = [aws_security_group.thm_security_group.id]
-  associate_public_ip_address = true
-  key_name                    = "thm-ecg-backend"
-
-  root_block_device {
-    volume_size           = 20
-    volume_type           = "gp3"
-    delete_on_termination = true
-  }
-
-  tags = {
-    Name    = "THM-Frontend-Server"
+    Name    = "THM-Application-Server"
     Project = "THM-ECG"
   }
 }
