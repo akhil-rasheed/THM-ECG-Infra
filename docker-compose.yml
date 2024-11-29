@@ -11,13 +11,19 @@ services:
       - ./postgres_data:/var/lib/postgresql/data
 
   backend:
-    image: ${ECR_REPOSITORY_URI}:latest
+    image: ${ECR_BACKEND_REPOSITORY_URI}:latest
     environment:
       - DATABASE_URL=postgresql://admin:password@postgres:5432/my_database
     ports:
       - "8000:8000"
     depends_on:
       - postgres
+
+  frontend:
+    build: ${ECR_FRONTEND_REPOSITORY_URI}:latest
+    ports:
+      - "80:80"
+    restart: always
 
 volumes:
   postgres_data:
