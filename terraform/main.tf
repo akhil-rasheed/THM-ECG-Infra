@@ -6,6 +6,13 @@ terraform {
     }
   }
 
+  backend "s3" {
+    bucket  = "thm-ecg-state-files"
+    key     = "terraform.tfstate"
+    region  = "eu-central-1"
+    encrypt = true
+  }
+
   required_version = ">= 1.9.0"
 }
 
