@@ -97,17 +97,12 @@ resource "aws_security_group" "thm_security_group" {
 }
 
 data "aws_ami" "ubuntu22" {
-  most_recent = true
+  most_recent = false
   owners      = ["amazon"]
-
+  
   filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-*"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
+    name   = "image-id"
+    values = ["ami-066902f7df67250f8"]
   }
 }
 
